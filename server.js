@@ -37,7 +37,7 @@ app.use(function(req, res, next) {
     .send('Not Found');
 });
 
-// Configure the Content-Security-Policy header
+// Setup Content-Security-Policy header
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -45,6 +45,20 @@ app.use(
         "script-src": ["'self'", "google.com"],
       },
     },
+  }),
+);
+
+// Setup X-Content-Type-Options header
+app.use(
+  helmet({
+     xContentTypeOptions: false,
+   }),
+);
+
+// Setup X-XSS-Protection header
+app.use(
+  helmet({
+    xXssProtection: false,
   }),
 );
 
