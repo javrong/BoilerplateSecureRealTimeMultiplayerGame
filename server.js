@@ -42,7 +42,8 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        "script-src": ["'self'", "google.com"],
+	"defaultSrc": ["'self'"]
+        "script-src": ["'self'", 'https://fonts.googleapis.com'],
       },
     },
   }),
@@ -55,12 +56,17 @@ app.use(
    }),
 );
 
+
 // Setup X-XSS-Protection header
+app.use(helmet.xssFilter();
+
+/*
 app.use(
   helmet({
     xXssProtection: false,
   }),
 );
+*/
 
 const portNum = process.env.PORT || 3000;
 
