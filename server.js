@@ -10,7 +10,7 @@ const runner = require('./test-runner.js');
 
 const app = express();
 
-const helmet = require('helmet')
+const helmet = require('helmet');
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
@@ -19,17 +19,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //For FCC testing purposes and enables user to connect from outside the hosting platform
-app.use(cors({origin: '*'})); 
+app.use(cors({origin: '*'}));
 
 // Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/index.html');
-  }); 
+  });
 
 //For FCC testing purposes
 fccTestingRoutes(app);
-    
+
 // 404 Not Found Middleware
 app.use(function(req, res, next) {
   res.status(404)
