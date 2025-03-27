@@ -42,7 +42,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-	"defaultSrc": ["'self'"]
+	"defaultSrc": ["'self'"],
         "script-src": ["'self'", 'https://fonts.googleapis.com'],
       },
     },
