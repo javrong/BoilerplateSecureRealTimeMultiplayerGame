@@ -37,7 +37,7 @@ app.use(function(req, res, next) {
     .send('Not Found');
 });
 
-// Setup Content-Security-Policy header
+// Set Content-Security-Policy header
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -49,24 +49,27 @@ app.use(
   }),
 );
 
-// Setup X-Content-Type-Options header
+// Set X-Content-Type-Options header
 app.use(
   helmet({
-     xContentTypeOptions: false,
+     xContentTypeOptions: true,
    }),
 );
 
-
-// Setup X-XSS-Protection header
-app.use(helmet.xssFilter();
-
-/*
+// Set X-XSS-Protection header
 app.use(
   helmet({
-    xXssProtection: false,
+    xXssProtection: true,
   }),
 );
-*/
+
+// Set X-Frame-Options header
+// Sets "X-Frame-Options: sameorigin"
+app.use(
+  helmet({
+    xFrameOptions: { action: "sameorigin" },
+  }),
+);
 
 const portNum = process.env.PORT || 3000;
 
