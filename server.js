@@ -10,8 +10,8 @@ const runner = require('./test-runner.js');
 
 const app = express();
 
-const helmet = require('helmet');
-const nocache = require('nocache');
+const helmet = require("helmet");
+const nocache = require("nocache");
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(helmet.noSniff());
 app.use(helmet.xssFilter({}));
+
 app.use(nocache());
 
 // Enabling header PHP-7.4.3
