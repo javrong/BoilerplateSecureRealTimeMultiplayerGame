@@ -18,6 +18,16 @@ app.use('/assets', express.static(process.cwd() + '/assets'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(helmet.noSniff());
+app.use(helmet.xssFilter({}));
+app.use(nocache());
+
+// Enabling header PHP-7.4.3
+app.use(function (req, res, next) {
+  res.setHeader('X-Powered-By', 'PHP 7.4.3');
+  next();
+});
+
 //For FCC testing purposes and enables user to connect from outside the hosting platform
 app.use(cors({origin: '*'}));
 
@@ -38,38 +48,38 @@ app.use(function(req, res, next) {
 });
 
 // Set Content-Security-Policy header
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-	"defaultSrc": ["'self'"],
-        "script-src": ["'self'", 'https://fonts.googleapis.com'],
-      },
-    },
-  }),
-);
+//app.use(
+//  helmet({
+//    contentSecurityPolicy: {
+//      directives: {
+//	"defaultSrc": ["'self'"],
+//        "script-src": ["'self'", 'https://fonts.googleapis.com'],
+//      },
+//   },
+//  }),
+//);
 
 // Set X-Content-Type-Options header
-app.use(
-  helmet({
-     xContentTypeOptions: true,
-   }),
-);
+//app.use(
+//  helmet({
+//     xContentTypeOptions: true,
+//   }),
+//);
 
 // Set X-XSS-Protection header
-app.use(
-  helmet({
-    xXssProtection: true,
-  }),
-);
+//app.use(
+//  helmet({
+//    xXssProtection: true,
+//  }),
+//);
 
 // Set X-Frame-Options header
 // Sets "X-Frame-Options: sameorigin"
-app.use(
-  helmet({
-    xFrameOptions: { action: "sameorigin" },
-  }),
-);
+//app.use(
+//  helmet({
+//    xFrameOptions: { action: "sameorigin" },
+//  }),
+//);
 
 const portNum = process.env.PORT || 3000;
 
