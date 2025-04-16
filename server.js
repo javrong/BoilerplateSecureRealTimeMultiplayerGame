@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(helmet.noSniff());
 app.use(helmet.xssFilter({}));
+app.use(helmet.noCache());
 
 app.use(nocache());
 
