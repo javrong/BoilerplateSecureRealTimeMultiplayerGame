@@ -1,10 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const expect = require('chai');
 const socket = require('socket.io');
-const nocache = require('nocache');
-const helmet = require('helmet');
+const nocache = require("nocache");
+const helmet = require("helmet");
 const cors = require('cors');
 
 const fccTestingRoutes = require('./routes/fcctesting.js');
@@ -18,77 +17,33 @@ app.use('/assets', express.static(process.cwd() + '/assets'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//app.use(helmet.noSniff());
-//app.use(helmet.xssFilter({}));
-app.use(helmet());
+app.use(helmet.noSniff());
+app.use(helmet.xssFilter({}));
 app.use(nocache());
-//app.use(helmet.noCache());
 
-// Enabling header nocache module
-//app.use(function (req, res, next) {
-//  res.setHeader('Surrogate-Control', 'no-store');
-//  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-//  res.setHeader('Expires', '0');
-//});
+//Enabling the use of CORS here breaks everything for some
+app.use(cors({origin: '*'})); //For FCC testing purposes only
 
-// Enabling header PHP-7.4.3
 app.use(function (req, res, next) {
-  res.setHeader('X-Powered-By', 'PHP 7.4.3');
+  res.setHeader( 'X-Powered-By', 'PHP 7.4.3' );
   next();
 });
 
-//For FCC testing purposes and enables user to connect from outside the hosting platform
-app.use(cors({origin: '*'}));
-
-// Index page (static HTML)
+// Index page (static HTML) 
 app.route('/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/index.html');
-  });
+  }); 
 
 //For FCC testing purposes
 fccTestingRoutes(app);
-
+    
 // 404 Not Found Middleware
 app.use(function(req, res, next) {
   res.status(404)
     .type('text')
     .send('Not Found');
 });
-
-// Set Content-Security-Policy header
-//app.use(
-//  helmet({
-//    contentSecurityPolicy: {
-//      directives: {
-//	"defaultSrc": ["'self'"],
-//        "script-src": ["'self'", 'https://fonts.googleapis.com'],
-//      },
-//   },
-//  }),
-//);
-
-// Set X-Content-Type-Options header
-//app.use(
-//  helmet({
-//     xContentTypeOptions: true,
-//   }),
-//);
-
-// Set X-XSS-Protection header
-//app.use(
-//  helmet({
-//    xXssProtection: true,
-//  }),
-//);
-
-// Set X-Frame-Options header
-// Sets "X-Frame-Options: sameorigin"
-//app.use(
-//  helmet({
-//    xFrameOptions: { action: "sameorigin" },
-//  }),
-//);
 
 const portNum = process.env.PORT || 3000;
 
@@ -108,4 +63,58 @@ const server = app.listen(portNum, () => {
   }
 });
 
+const io = socket(server)
+const gameState = {
+  players: {},
+  lobbyLeader : ""
+}
+
+io.on('connection', (socket) => {
+  console.log("Server: a user connected:", socket.id);
+
+  socket.on("disconnect", ()=>{
+    console.log("User Disconnected")
+    if(gameState.players.length > 1)//If there are more players in there
+      if(lobbyLeader == gameState.players[socket.id].id)//And the lobby leader quits
+        lobbyLeader = gameState.players[0].id
+
+    delete gameState.players[socket.id]
+  })
+
+  socket.on('newPlayer', (player)=>{
+    console.log("Server : New joined the game!")
+    gameState.players[socket.id] = player
+    gameState.lobbyLeader = player.id
+    console.log(gameState)
+    })
+
+    socket.on("playerMoved", (player) => { // update gameState.players array
+      if(gameState.players[socket.id]){
+        gameState.players[socket.id].x = player.x
+        gameState.players[socket.id].y = player.y
+      }
+    })
+
+    socket.on("newCollectible", (collectible) => { // update gameState.players array
+      console.log("New Collectible")
+      gameState.collectible = collectible
+    })
+
+    socket.on("collectibleCaught", (playerandcollectible) => { // update gameState.players array
+      console.log("Collectible Caught")
+      delete gameState.collectible//Destroy Collectible
+      for (var player in gameState.players) { // Update scores
+        if (gameState.players[player].id == playerandcollectible.id)
+          gameState.players[player].score += playerandcollectible.value
+          gameState.caughtLastCollectible = playerandcollectible.id
+      }
+      console.log(gameState.players)
+    })
+})
+
+setInterval(() => {
+  io.sockets.emit('state', gameState);
+}, 1000/60);
+
 module.exports = app; // For testing
+
