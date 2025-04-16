@@ -11,7 +11,7 @@ const runner = require('./test-runner.js');
 const app = express();
 
 const helmet = require('helmet');
-const nocache = require("nocache");
+const nocache = require('nocache');
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/assets', express.static(process.cwd() + '/assets'));
