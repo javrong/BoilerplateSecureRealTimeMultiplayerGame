@@ -22,11 +22,11 @@ app.use(helmet.noSniff());
 app.use(helmet.xssFilter({}));
 //app.use(helmet.noCache());
 
-app.use(nocache(function (req, res, next) {
+app.use(function (req, res, next) {
   res.setHeader('Surrogate-Control', 'no-store');
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Expires', '0');
-}));
+});
 
 // Enabling header PHP-7.4.3
 app.use(function (req, res, next) {
